@@ -7,8 +7,8 @@ CarCounting :: CarCounting(int pin1, int pin2){
     this->lastButtonState = 0;
     this->pinE = pin1;
     this->pinS = pin2;
-
 }
+
 void CarCounting :: add(int state){
     if (this->lastButtonState == HIGH && this->lastButtonState != state){
         this->carNumber++;
