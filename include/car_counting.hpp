@@ -6,7 +6,8 @@ class CarCounting{
     private : 
         int carNumber;
         int buttonState;         // current state of the switch
-        int lastButtonState;     // previous state of the switch
+        int lastButtonStateE;     // previous state of the switch
+         int lastButtonStateS;
         void add(int state);
         void substract(int state);
         int pinE;
