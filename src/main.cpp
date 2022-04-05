@@ -9,7 +9,7 @@ constexpr long ROTATION_STEPS = 2 << 9;
 
 //AccelStepper stepper(AccelStepper::FULL4WIRE, 5, 3, 4, 2);
 
-const int PIN_ENTER_A = 5,PIN_ENTER_B = 2, PIN_EXIT_A=2, PIN_EXIT_B=2;
+const int PIN_ENTER_A = 13,PIN_ENTER_B = 2, PIN_EXIT_A=2, PIN_EXIT_B=2;
 const int TRIG_PIN_A=18, ECHO_PIN_A=19,TRIG_PIN_B=2, ECHO_PIN_B=2;
 int durationA,durationB;
 
@@ -39,11 +39,12 @@ void start() {
 	pinMode(sensB.getPinE(), INPUT);
 	pinMode(sensB.getPinS(), INPUT);
 
+
 	// initialize the captor pin :
-	pinMode(TRIG_PIN_A, OUTPUT); 
-    pinMode(ECHO_PIN_A, INPUT); 
-	pinMode(detectionB.getTrigPin(), OUTPUT);
-    pinMode(detectionB.getEchoPin(), INPUT); 
+	//pinMode(TRIG_PIN_A, OUTPUT); 
+    //pinMode(ECHO_PIN_A, INPUT); 
+	//pinMode(detectionB.getTrigPin(), OUTPUT);
+    //pinMode(detectionB.getEchoPin(), INPUT); 
 	 
 	Serial.println("done");
 }
@@ -55,6 +56,7 @@ void loop() {
 	//Add or substract a car to the bridge
 	sensA.change(digitalRead(sensA.getPinE()),digitalRead(sensA.getPinS()));
 	//sensB.change(digitalRead(sensB.getPinE()),digitalRead(sensB.getPinS()));
+	Serial.println("hello");
 
 	// --- Ultrasonic Captor ---
 /*
@@ -89,5 +91,5 @@ void loop() {
 */
 	
 
-	delay(100-interDelay);
+	//delay(100-interDelay);
 }	// Not used.
