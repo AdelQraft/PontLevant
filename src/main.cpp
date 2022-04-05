@@ -11,6 +11,7 @@ constexpr int_fast32_t REVOLUTION_STEPS = 200;
 void setup() {
 	// Temporary.
 	Serial.begin(9600);
+	/*
 	while (!Serial);
 
 /*
