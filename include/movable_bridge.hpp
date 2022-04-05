@@ -2,27 +2,33 @@
 #define _VILLE_CONNECTEE_MOVABLE_BRIDGE_H
 
 #include <Arduino.h>
-#include <AccelStepper.h>
+#include "stepper_driver/interface.hpp"
 
+#include <type_traits>
+
+template<typename StepperDriverT>
 class MovableBridge {
+	static_assert(std::is_base_of<StepperDriver::IStepperDriver, StepperDriverT>::value, "StepperDriverT must inherit from StepperDriver::IStepperDriver");
 private:
-	using move_handler_t = void (MovableBridge::*)(long);
+	#define callSteppersMethod(method, ...) { s1.method(__VA_ARGS__); s2.method(__VA_ARGS__); }	// Warning! Unsafe macro!
 
-	AccelStepper leftStepper/*, rightStepper*/;
-	long speed, openAbsPos;
-	move_handler_t moveHandler;
-	void constSpeedMove(long absPos);
-	void accelMove(long absPos);
+	StepperDriverT s1, s2;
+	int_fast32_t openAngle;
 public:
-	MovableBridge(int steps, uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4, long openAbsPos, long speed = 500);
-	uint32_t getOpenAbsPos() const;
-	void setOpenAbsPos(uint32_t steps);
-	void setSpeed(float speed);
-	void setMaxSpeed(float speed);
-	void setAcceleration(float accel = 0);
-	void move(long absPos);
-	void open();
-	void close();
+	using PinoutDescriptor = typename StepperDriverT::PinoutDescriptor;
+
+	int_fast32_t getOpenAngle() const { return openAngle; };
+	void setOpenAngle(int_fast32_t openAngle) { this->openAngle = openAngle; }
+	void setSpeed(int_fast32_t speed) { callSteppersMethod(setSpeed, speed); }
+
+	MovableBridge(const PinoutDescriptor& pd1, const PinoutDescriptor& pd2, int_fast32_t openAngle = 0, uint_fast32_t speed = 10)
+		: s1(pd1, speed), s2(pd2, speed) { setOpenAngle(openAngle); }
+
+	void open() { callSteppersMethod(setTargetAngle, openAngle); callSteppersMethod(move); }
+	void close() { callSteppersMethod(setTargetAngle, 0); callSteppersMethod(move); }
+
+private:
+	#undef callSteppersMethod
 };
 
 #endif

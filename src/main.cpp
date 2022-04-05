@@ -1,95 +1,93 @@
 #include <Arduino.h>
-//#include "movable_bridge.hpp"
-#include <AccelStepper.h>
-#include "car_counting.hpp" 
+
+#include "car_counting.hpp"
 #include "boat_detection.hpp"
+#include "stepper_driver/a4988.hpp"
 
+constexpr uint8_t STEP_PIN = 12;
+constexpr uint8_t DIR_PIN = 14;
 
-constexpr long ROTATION_STEPS = 2 << 9;
+constexpr int_fast32_t REVOLUTION_STEPS = 200;
 
-//AccelStepper stepper(AccelStepper::FULL4WIRE, 5, 3, 4, 2);
-
-const int PIN_ENTER_A = 13,PIN_ENTER_B = 2, PIN_EXIT_A=2, PIN_EXIT_B=2;
+const int PIN_ENTER_A = 15,PIN_ENTER_B = 2, PIN_EXIT_A=2, PIN_EXIT_B=2;
 const int TRIG_PIN_A=18, ECHO_PIN_A=19,TRIG_PIN_B=2, ECHO_PIN_B=2;
-int durationA,durationB;
+//int durationA,durationB;
 
 CarCounting sensA(PIN_ENTER_A,PIN_EXIT_A), sensB(PIN_ENTER_B,PIN_EXIT_B);
-BoatDectection detectionA(TRIG_PIN_A,ECHO_PIN_A), detectionB(TRIG_PIN_B,ECHO_PIN_B);
+//BoatDectection detectionA(TRIG_PIN_A,ECHO_PIN_A), detectionB(TRIG_PIN_B,ECHO_PIN_B);
 
-#define start setup
-void start() {
+
+void setup() {
+	// Temporary.
 	Serial.begin(9600);
-	/*
+	
 	while (!Serial);
 
-	stepper.setMaxSpeed(1000.0); // set the maximum speed
-	//stepper.setAcceleration(0); // set acceleration
-	stepper.setCurrentPosition(0); // set position
-	stepper.moveTo(ROTATION_STEPS);
-	stepper.setSpeed(500); // set initial speed
+/*
+	pinMode(STEP_PIN, OUTPUT);
+	pinMode(DIR_PIN, OUTPUT);
 
-	// MovableBridge bridge(2048, 8, 10, 9, 11, 512, 512, 100);
-	// bridge.open();
+	digitalWrite(DIR_PIN, HIGH);
 
-	while (stepper.distanceToGo() > 0) stepper.runSpeedToPosition();
-*/
-	// initialize the switch pin as an input:
- 	pinMode(sensA.getPinE(), INPUT);
-	pinMode(sensA.getPinS(), INPUT);
-	pinMode(sensB.getPinE(), INPUT);
-	pinMode(sensB.getPinS(), INPUT);
+	for (int x = 0; x < REVOLUTION_STEPS; x++) {
+		digitalWrite(STEP_PIN, HIGH);
+		delayMicroseconds(2000);
+		digitalWrite(STEP_PIN, LOW);
+		delayMicroseconds(2000);
+	}*/
 
+	 // initialize the switch pin as an input:
+   // pinMode(sensA.getPinE(), INPUT);
+   // pinMode(sensA.getPinS(), INPUT);
+   // pinMode(sensB.getPinE(), INPUT);
+   // pinMode(sensB.getPinS(), INPUT);
 
 	// initialize the captor pin :
 	//pinMode(TRIG_PIN_A, OUTPUT); 
     //pinMode(ECHO_PIN_A, INPUT); 
 	//pinMode(detectionB.getTrigPin(), OUTPUT);
     //pinMode(detectionB.getEchoPin(), INPUT); 
-	 
-	Serial.println("done");
-}
 
-void loop() {
+
+	//StepperDriver::A4988 stepper(StepperDriver::A4988::PinoutDescriptor(12, 14));
+	//stepper.setTargetAngle(8 * REVOLUTION_STEPS);
+	//stepper.move();
+
+	Serial.println("done");
+};
+
+void loop(){
 	int interDelay = 0;
 
 	// --- Switch ---
 	//Add or substract a car to the bridge
 	sensA.change(digitalRead(sensA.getPinE()),digitalRead(sensA.getPinS()));
 	//sensB.change(digitalRead(sensB.getPinE()),digitalRead(sensB.getPinS()));
-	Serial.println("hello");
+	Serial.println(digitalRead(sensA.getPinE()));
 
 	// --- Ultrasonic Captor ---
+
 /*
-	// Clears the trigPin condition
-	digitalWrite(TRIG_PIN_A, LOW);
-	//digitalWrite(TRIG_PIN_B, LOW);
-  	delayMicroseconds(2);
-	interDelay += 2;
-  	// Sets the trigPin HIGH (ACTIVE) for 10 microseconds
-  	digitalWrite(TRIG_PIN_A, HIGH);
-	//digitalWrite(TRIG_PIN_B, HIGH);
+	// More generic
 
-  	delayMicroseconds(10);
-	interDelay+= 10;
-  	digitalWrite(TRIG_PIN_A, LOW);
-	//digitalWrite(TRIG_PIN_B, LOW);
-
-	
-  	durationA = pulseIn(detectionA.getEchoPin(), HIGH);
-	//durationB = pulseIn(sensB.getPinE(), HIGH);
-	//Boat detection	
-
-	Serial.println(pulseIn(ECHO_PIN_A, HIGH));
+	MovableBridge<StepperDriver::A4988> bridge = decltype(bridge) (
+		decltype(bridge)::PinoutDescriptor(23, 22),
+		decltype(bridge)::PinoutDescriptor(21, 19)
+	);
 */
 /*
-	// -- Combination ---
-  	if (detectionA.detection(durationA * 0.034 / 2)||detectionB.detection(durationB * 0.034 / 2)){
-		  if (sensA.isEmpty()&&sensB.isEmpty()){
-			  //Ouvrir le pont
-		  };
-	}; 
-*/
-	
+	MovableBridge<StepperDriver::A4988> bridge (
+		StepperDriver::A4988::PinoutDescriptor(12, 14),
+		StepperDriver::A4988::PinoutDescriptor(21, 19),
+		REVOLUTION_STEPS
+	);
 
-	//delay(100-interDelay);
+	bridge.open();
+	delay(5000);
+	bridge.close();
+*/
+
+
+
+	delay(100-interDelay);
 }	// Not used.
