@@ -1,4 +1,6 @@
 #include <Arduino.h>
+//#include <ESP8266WiFi.h>
+//#include <BlynkSimpleEsp8266.h>
 
 #include "car_counting.hpp"
 #include "boat_detection.hpp"
@@ -9,7 +11,7 @@ constexpr uint8_t DIR_PIN = 14;
 
 constexpr int_fast32_t REVOLUTION_STEPS = 200;
 
-const int PIN_ENTER_A = 15,PIN_ENTER_B = 2, PIN_EXIT_A=2, PIN_EXIT_B=2;
+const int PIN_ENTER_A = 15,PIN_ENTER_B = 2, PIN_EXIT_A=13, PIN_EXIT_B=2;
 const int TRIG_PIN_A=18, ECHO_PIN_A=19,TRIG_PIN_B=2, ECHO_PIN_B=2;
 //int durationA,durationB;
 
@@ -37,8 +39,8 @@ void setup() {
 	}*/
 
 	 // initialize the switch pin as an input:
-   // pinMode(sensA.getPinE(), INPUT);
-   // pinMode(sensA.getPinS(), INPUT);
+   	pinMode(sensA.getPinE(), INPUT);
+	pinMode(sensA.getPinS(), INPUT);
    // pinMode(sensB.getPinE(), INPUT);
    // pinMode(sensB.getPinS(), INPUT);
 
@@ -53,8 +55,15 @@ void setup() {
 	//stepper.setTargetAngle(8 * REVOLUTION_STEPS);
 	//stepper.move();
 
+	uint8_t c = 15;
+	pinMode(c, INPUT);
+	//digitalWrite(c, HIGH);
+
+
+
+
 	Serial.println("done");
-};
+}
 
 void loop(){
 	int interDelay = 0;
@@ -63,7 +72,7 @@ void loop(){
 	//Add or substract a car to the bridge
 	sensA.change(digitalRead(sensA.getPinE()),digitalRead(sensA.getPinS()));
 	//sensB.change(digitalRead(sensB.getPinE()),digitalRead(sensB.getPinS()));
-	Serial.println(digitalRead(sensA.getPinE()));
+	//Serial.println(digitalRead(15));
 
 	// --- Ultrasonic Captor ---
 
