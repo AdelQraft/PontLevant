@@ -8,6 +8,9 @@ namespace StepperDriver {
 	private:
 		uint8_t stepPin, dirPin;
 		uint32_t halfSpeedDelay;
+		int_fast8_t increment;
+
+		void updateDirection();
 	public:
 		struct PinoutDescriptor {
 		public:
@@ -16,11 +19,15 @@ namespace StepperDriver {
 			PinoutDescriptor(uint8_t stepPin, uint8_t dirPin);
 		};
 
-		A4988(const PinoutDescriptor&, uint32_t speed = 10, int_fast32_t currentAngle = 0);
+		static constexpr uint32_t DEFAULT_SPEED = 100;
+
+		A4988(const PinoutDescriptor&, uint32_t speed = DEFAULT_SPEED, int_fast32_t currentAngle = 0);
+		void setCurrentAngle(int_fast32_t) override;
+		void setTargetAngle(int_fast32_t) override;
 		uint32_t getHalfSpeedDelay() const;
-		void setHalfSpeedDelay(uint32_t halfSpeedDelay);
+		void setHalfSpeedDelay(uint32_t);
 		uint32_t getSpeed() const;
-		void setSpeed(uint32_t speed);
+		void setSpeed(uint32_t);
 		void move();
 	};
 }
