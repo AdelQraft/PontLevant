@@ -2,8 +2,8 @@
 //#include <ESP8266WiFi.h>
 //#include <BlynkSimpleEsp8266.h>
 
-//#include "car_counting.hpp"
-//#include "boat_detection.hpp"
+#include "car_counting.hpp"
+#include "boat_detection.hpp"
 
 #include "movable_bridge.hpp"
 #include "stepper_driver/a4988.hpp"
@@ -21,10 +21,13 @@ int durationA,durationB;
 CarCounting sensA(PIN_ENTER_A,PIN_EXIT_A), sensB(PIN_ENTER_B,PIN_EXIT_B);
 BoatDectection detectionA(TRIG_PIN_A,ECHO_PIN_A), detectionB(TRIG_PIN_B,ECHO_PIN_B);
 */
+const int PIN_ENTER_A = 15,PIN_ENTER_B = 2, PIN_EXIT_A=13, PIN_EXIT_B=2;
+CarCounting sensA(PIN_ENTER_A,PIN_EXIT_A), sensB(PIN_ENTER_B,PIN_EXIT_B);
+
 
 void setup() {
-	debugInit();
-
+	//debugInit();
+	
 	// Objet pont levant
 	MovableBridge<StepperDriver::A4988> bridge = decltype(bridge) (
 		decltype(bridge)::PinoutDescriptor(14, 12),
@@ -37,6 +40,32 @@ void setup() {
 	bridge.open();
 	delay(5000);
 	bridge.close();
+	
+
+	// initialize the switch pin as an input:
+   // pinMode(sensA.getPinE(), INPUT);
+   // pinMode(sensA.getPinS(), INPUT);
+   // pinMode(sensB.getPinE(), INPUT);
+   // pinMode(sensB.getPinS(), INPUT);
+	uint8_t c = 27;
+   pinMode(c, INPUT);
+
 }
 
-void loop() {}	// Not used.
+void loop() {
+	// --- Switch ---
+	//Add or substract a car to the bridge
+	sensA.change(digitalRead(sensA.getPinE()),digitalRead(sensA.getPinS()));
+	//sensB.change(digitalRead(sensB.getPinE()),digitalRead(sensB.getPinS()));
+	//Serial.println(digitalRead(15));
+
+	uint8_t c = 27;
+	pinMode(c, INPUT);
+	//digitalWrite(c, HIGH);
+
+
+
+
+	delay(100);
+
+}
