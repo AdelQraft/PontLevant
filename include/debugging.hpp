@@ -8,7 +8,11 @@
 #	define debugInit _debugInit
 #	define debugPrint Serial.print
 #	define debugPrintln Serial.println
+#ifdef _ESP
 #	define debugPrintf Serial.printf
+#else
+#	define debugPrintf(...)
+#endif
 #else
 #	define debuggingInit()
 #	define debugPrint(...)

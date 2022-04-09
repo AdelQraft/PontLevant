@@ -20,4 +20,10 @@ namespace StepperDriver {
 	void IStepperDriver::setTargetAngle(int_fast32_t angle) {
 		this->targetAngle = angle;
 	}
+
+	void IStepperDriver::run() {
+		while (currentAngle != targetAngle) {
+			step();
+		}
+	}
 }

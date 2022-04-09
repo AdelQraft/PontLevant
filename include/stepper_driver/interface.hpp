@@ -15,7 +15,8 @@ namespace StepperDriver {
 		int_fast32_t getTargetAngle() const;
 		virtual void setTargetAngle(int_fast32_t angle);
 		virtual void setSpeed(uint32_t speed) = 0;
-		virtual void move() = 0;
+		virtual void step() = 0;
+		virtual void run() ;
 	};
 }
 

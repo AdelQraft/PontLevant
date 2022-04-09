@@ -28,7 +28,7 @@ namespace StepperDriver {
 		void setHalfSpeedDelay(uint32_t);
 		uint32_t getSpeed() const;
 		void setSpeed(uint32_t);
-		void move();
+		void step();
 	};
 }
 

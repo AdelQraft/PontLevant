@@ -2,7 +2,11 @@
 
 #include <Arduino.h>
 
+#ifdef _ESP
 #include <cassert>
+#else
+#include <assert.h>
+#endif
 
 #include "debugging.hpp"
 
@@ -55,20 +59,15 @@ namespace StepperDriver {
 		halfSpeedDelay = (uint32_t)1e6 / speed / 2;
 	}
 
-	void A4988::move() {
-		debugPrintf(
-			"currentAngle: %d, targetAngle: %d, stepPin: %hhu, dirPin: %hhu, halfSpeedDelay: %u, increment: %hhu\n",
-			currentAngle, targetAngle, stepPin, dirPin, halfSpeedDelay, increment
-		);
+	void A4988::step() {
+		//debugPrintf("currentAngle: %d, targetAngle: %d\n", currentAngle, targetAngle);
 
-		while (currentAngle != targetAngle) {
-			digitalWrite(stepPin, HIGH);
-			delayMicroseconds(halfSpeedDelay);
-			digitalWrite(stepPin, LOW);
-			delayMicroseconds(halfSpeedDelay);
+		digitalWrite(stepPin, HIGH);
+		delayMicroseconds(halfSpeedDelay);
+		digitalWrite(stepPin, LOW);
+		delayMicroseconds(halfSpeedDelay);
 
-			currentAngle += increment;
-		}
+		currentAngle += increment;
 	}
 
 	A4988::PinoutDescriptor::PinoutDescriptor(uint8_t stepPin, uint8_t dirPin)
