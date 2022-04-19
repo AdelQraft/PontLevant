@@ -8,7 +8,7 @@
 
 namespace StepperDriver {
 	void A4988::updateDirection() {
-		if (targetAngle > currentAngle) {
+		if (targetStep > currentStep) {
 			digitalWrite(dirPin, HIGH);
 			increment = 1;
 		} else {
@@ -17,24 +17,24 @@ namespace StepperDriver {
 		}
 	}
 
-	A4988::A4988(const A4988::PinoutDescriptor &pinoutDescriptor, uint32_t speed, int_fast32_t currentAngle) {
+	A4988::A4988(const A4988::PinoutDescriptor &pinoutDescriptor, uint32_t speed, int_fast32_t currentStep) {
 		stepPin = pinoutDescriptor.stepPin;
 		dirPin = pinoutDescriptor.dirPin;
 
 		pinMode(stepPin, OUTPUT);
 		pinMode(dirPin, OUTPUT);
 
-		this->currentAngle = currentAngle;
+		this->currentStep = currentStep;
 		setSpeed(speed);
 	}
 
-	void A4988::setCurrentAngle(int_fast32_t angle) {
-		currentAngle = angle;
+	void A4988::setCurrentStep(int_fast32_t step) {
+		currentStep = step;
 		updateDirection();
 	}
 
-	void A4988::setTargetAngle(int_fast32_t angle) {
-		targetAngle = angle;
+	void A4988::setTargetStep(int_fast32_t step) {
+		targetStep = step;
 		updateDirection();
 	}
 
@@ -42,7 +42,7 @@ namespace StepperDriver {
 		return halfSpeedDelay;
 	}
 
-	void A4988::setHalfSpeedDelay(uint32_t halfSpeedDelay) {
+	void A4988::setHalfSpeedDelay(delay_t halfSpeedDelay) {
 		this->halfSpeedDelay = halfSpeedDelay;
 	}
 
@@ -50,24 +50,24 @@ namespace StepperDriver {
 		return (uint32_t)10e6 / halfSpeedDelay / 2;
 	}
 
-	void A4988::setSpeed(uint32_t speed) {
+	void A4988::setSpeed(delay_t speed) {
 		assert(speed != 0);
 		halfSpeedDelay = (uint32_t)1e6 / speed / 2;
 	}
 
 	void A4988::move() {
 		debugPrintf(
-			"currentAngle: %d, targetAngle: %d, stepPin: %hhu, dirPin: %hhu, halfSpeedDelay: %u, increment: %hhu\n",
-			currentAngle, targetAngle, stepPin, dirPin, halfSpeedDelay, increment
+			"currentStep: %d, targetStep: %d, stepPin: %hhu, dirPin: %hhu, halfSpeedDelay: %u, increment: %hhu\n",
+			currentStep, targetStep, stepPin, dirPin, halfSpeedDelay, increment
 		);
 
-		while (currentAngle != targetAngle) {
+		while (currentStep != targetStep) {
 			digitalWrite(stepPin, HIGH);
 			delayMicroseconds(halfSpeedDelay);
 			digitalWrite(stepPin, LOW);
 			delayMicroseconds(halfSpeedDelay);
 
-			currentAngle += increment;
+			currentStep += increment;
 		}
 	}
 

@@ -29,7 +29,7 @@ void setup() {
 	MovableBridge<StepperDriver::A4988> bridge = decltype(bridge) (
 		decltype(bridge)::PinoutDescriptor(14, 12),
 		decltype(bridge)::PinoutDescriptor(32, 33),	// Pas utilisé car l'un des drivers est brisé.
-		250	// Vitesse en steps/seconde.
+		500	// Vitesse en steps/seconde.
 	);
 
 	// bridge.setOpenAngle sert à configurer l'angle d'ouverture. Augmenter si n'ouvre pas assez et diminuer si ouvre trop. Modifier le coefficient devant REVOLUTION_ANGLE dans la définition de REVOLUTION_ANGLE;
