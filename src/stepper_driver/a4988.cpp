@@ -2,7 +2,11 @@
 
 #include <Arduino.h>
 
+#ifdef _ESP
 #include <cassert>
+#else
+#include <assert.h>
+#endif
 
 #include "debugging.hpp"
 

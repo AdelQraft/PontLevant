@@ -55,4 +55,10 @@ namespace StepperDriver {
 	int_fast32_t IStepperDriver::stepToAngle(int_fast32_t step) const {
 		return step / angleScale;
 	}
+
+	void IStepperDriver::run() {
+		while (currentAngle != targetAngle) {
+			step();
+		}
+	}
 }
