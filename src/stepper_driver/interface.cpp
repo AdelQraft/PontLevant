@@ -24,19 +24,19 @@ namespace StepperDriver {
 		targetStep = step;
 	}
 
-	int_fast32_t IStepperDriver::getCurrentAngle() const {
+	float IStepperDriver::getCurrentAngle() const {
 		return stepToAngle(currentStep);
 	}
 
-	void IStepperDriver::setCurrentAngle(int_fast32_t angle) {
+	void IStepperDriver::setCurrentAngle(float angle) {
 		setCurrentStep(angleToStep(angle));
 	}
 
-	int_fast32_t IStepperDriver::getTargetAngle() const {
+	float IStepperDriver::getTargetAngle() const {
 		return stepToAngle(targetStep);
 	}
 
-	void IStepperDriver::setTargetAngle(int_fast32_t angle) {
+	void IStepperDriver::setTargetAngle(float angle) {
 		setTargetStep(angleToStep(angle));
 	}
 
@@ -44,21 +44,15 @@ namespace StepperDriver {
 		return angleScale * REVOLUTION_ANGLE_RAD;
 	}
 
-	void IStepperDriver::setRevolutionSteps(uint_fast32_t steps) {
-		angleScale = roundf(steps / REVOLUTION_ANGLE_RAD);
+	void IStepperDriver::setRevolutionSteps(uint_fast32_t revolSteps) {
+		angleScale = revolSteps / REVOLUTION_ANGLE_RAD;
 	};
 
 	int_fast32_t IStepperDriver::angleToStep(int_fast32_t angle) const {
 		return angleScale * angle;
 	}
 
-	int_fast32_t IStepperDriver::stepToAngle(int_fast32_t step) const {
+	float IStepperDriver::stepToAngle(int_fast32_t step) const {
 		return step / angleScale;
-	}
-
-	void IStepperDriver::run() {
-		while (currentAngle != targetAngle) {
-			step();
-		}
 	}
 }
