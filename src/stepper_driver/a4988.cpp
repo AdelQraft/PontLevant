@@ -54,9 +54,9 @@ namespace StepperDriver {
 	}
 
 	void A4988::run() {
-		delay_t delta = abs(200 - currentStep);
-		if (delta == 0) return;
-		delay_t halfSpeedDelay = static_cast<delay_t>(1e6) * delta / speed / 2;
+		if (targetStep == currentStep) return;
+
+		delay_t halfSpeedDelay = static_cast<delay_t>(1e6) / speed / 2;
 		debugPrintf("targetStep: %d, currentStep: %d, halfSpeedDelay: %d, stepPin: %d, dirPin: %d, speed: %d\n", targetStep, currentStep, halfSpeedDelay, stepPin, dirPin, speed);
 
 		do {
@@ -64,7 +64,7 @@ namespace StepperDriver {
 			delayMicroseconds(halfSpeedDelay);
 			digitalWrite(stepPin, LOW);
 			delayMicroseconds(halfSpeedDelay);
-
+			debugPrintln(currentStep);
 			currentStep += increment;
 		} while (currentStep != targetStep);
 	}

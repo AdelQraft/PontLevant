@@ -6,6 +6,7 @@
 
 #ifdef _ESP
 #include <type_traits>
+#include <thread>
 #endif
 
 template<typename StepperDriverT1, typename StepperDriverT2>
@@ -23,13 +24,10 @@ private:
 	int_fast32_t openAngle;
 
 	void run() {
-		debugPrintf("Run -- currentAngle: %d, targetAngle: %d\n", s1.getCurrentAngle(), openAngle);
-
-		const int_fast32_t targetAngle = s1.getTargetAngle();
-		while (s1.getCurrentAngle() != targetAngle) {
-			s1.step();
-			s2.step();
-		}
+		std::thread t1(&StepperDriverT1::run, &s1);
+		std::thread t2(&StepperDriverT2::run, &s2);
+		t1.join();
+		t2.join();
 	}
 public:
 	using PinoutDescriptor1 = typename StepperDriverT1::PinoutDescriptor;
