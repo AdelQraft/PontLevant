@@ -3,6 +3,8 @@
 #include "movable_bridge.hpp"
 #include "stepper_driver/a4988.hpp"
 
+#include "debugging.hpp"
+
 constexpr uint8_t STEP_PIN = 12;
 constexpr uint8_t DIR_PIN = 14;
 
@@ -38,11 +40,6 @@ void setup() {
 	bridge.open();
 	delay(5000);
 	bridge.close();
-	bridge.open();
-	delay(5000);
-	bridge.close();
-*/
->>>>>>> f35a0966dde310a6d17a0f7098e5e739b10ca747
 
 	// initialize the switch pin as an input:
 	//pinMode(sensA.getPinE(), INPUT);
