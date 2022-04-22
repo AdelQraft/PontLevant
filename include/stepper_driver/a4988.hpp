@@ -7,7 +7,7 @@ namespace StepperDriver {
 	class A4988 : public IStepperDriver {
 	private:
 		uint8_t stepPin, dirPin;
-		uint32_t halfSpeedDelay;
+		delay_t speed;
 		int_fast8_t increment;
 
 		void updateDirection();
@@ -20,15 +20,15 @@ namespace StepperDriver {
 		};
 
 		static constexpr uint32_t DEFAULT_SPEED = 100;
+		static constexpr uint_fast32_t REVOLUTION_STEPS = 200;
 
-		A4988(const PinoutDescriptor&, uint32_t speed = DEFAULT_SPEED, int_fast32_t currentAngle = 0);
-		void setCurrentAngle(int_fast32_t) override;
-		void setTargetAngle(int_fast32_t) override;
-		uint32_t getHalfSpeedDelay() const;
-		void setHalfSpeedDelay(uint32_t);
-		uint32_t getSpeed() const;
-		void setSpeed(uint32_t);
-		void move();
+		A4988(const PinoutDescriptor&, uint_fast32_t revolutionSteps, uint32_t speed = DEFAULT_SPEED);
+		void setCurrentStep(int_fast32_t) override;
+		void setTargetStep(int_fast32_t) override;
+		
+		delay_t getSpeed() const;
+		void setSpeed(delay_t speed) override;
+		void run();
 	};
 }
 

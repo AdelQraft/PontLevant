@@ -1,13 +1,14 @@
 #ifndef _VILLE_CONNECTEE_CAR_COUNTING_H
 #define _VILLE_CONNECTEE_CAR_COUNTING_H
 #include <Arduino.h>
+#include "debugging.hpp"
 
 class CarCounting{
     private : 
         int carNumber;
         int buttonState;         // current state of the switch
         int lastButtonStateE;     // previous state of the switch
-         int lastButtonStateS;
+        int lastButtonStateS;
         void add(int state);
         void substract(int state);
         int pinE;
@@ -21,7 +22,6 @@ class CarCounting{
         int getCarNumber();
 
 };
-
 
 #endif
 

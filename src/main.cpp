@@ -8,49 +8,102 @@ constexpr uint8_t DIR_PIN = 14;
 
 constexpr int_fast32_t REVOLUTION_STEPS = 200;
 
-void setup() {
-	// Temporary.
-	Serial.begin(9600);
-	/*
-	while (!Serial);
-
 /*
-	pinMode(STEP_PIN, OUTPUT);
-	pinMode(DIR_PIN, OUTPUT);
+constexpr uint8_t PIN_ENTER_A = 15,PIN_ENTER_B = 2, PIN_EXIT_A=13, PIN_EXIT_B=2;
+constexpr uint8_t TRIG_PIN_A=18, ECHO_PIN_A=19,TRIG_PIN_B=2, ECHO_PIN_B=2;
+int durationA, durationB;
 
-	digitalWrite(DIR_PIN, HIGH);
-
-	for (int x = 0; x < REVOLUTION_STEPS; x++) {
-		digitalWrite(STEP_PIN, HIGH);
-		delayMicroseconds(2000);
-		digitalWrite(STEP_PIN, LOW);
-		delayMicroseconds(2000);
-	}*/
-
-
-	StepperDriver::A4988 stepper(StepperDriver::A4988::PinoutDescriptor(12, 14));
-	stepper.setTargetAngle(8 * REVOLUTION_STEPS);
-	stepper.move();
-
-/*
-	// More generic
-
-	MovableBridge<StepperDriver::A4988> bridge = decltype(bridge) (
-		decltype(bridge)::PinoutDescriptor(23, 22),
-		decltype(bridge)::PinoutDescriptor(21, 19)
-	);
+CarCounting sensA(PIN_ENTER_A,PIN_EXIT_A), sensB(PIN_ENTER_B,PIN_EXIT_B);
+BoatDectection detectionA(TRIG_PIN_A,ECHO_PIN_A), detectionB(TRIG_PIN_B,ECHO_PIN_B);
 */
+constexpr uint8_t PIN_ENTER_A = 26, PIN_EXIT_A = 27;
+//CarCounting sensA(PIN_ENTER_A,PIN_EXIT_A);
+const int dirPin = 12;
+const int stepPin = 14;
+const int dirPin2 = 15;
+const int stepPin2 = 2;
+const int stepsPerRevolution = 3200;
+
+void setup() {
+	debugInit();
+
+	pinMode(stepPin, OUTPUT);
+	pinMode(dirPin, OUTPUT);
+
+	pinMode(stepPin2, OUTPUT);
+	pinMode(dirPin2, OUTPUT);
+
 /*
-	MovableBridge<StepperDriver::A4988> bridge (
-		StepperDriver::A4988::PinoutDescriptor(12, 14),
-		StepperDriver::A4988::PinoutDescriptor(21, 19),
-		REVOLUTION_STEPS
+	pinMode(2, OUTPUT);
+	digitalWrite(2, HIGH);
+	
+	StepperDriver::A4988 s(StepperDriver::A4988::PinoutDescriptor(14, 12), 200, 20);
+	s.setTargetAngle(2 * PI);
+	s.run();
+*/
+	// Objet pont levant
+/*	MovableBridge<StepperDriver::A4988, StepperDriver::A4988> bridge (
+		StepperDriver::A4988::PinoutDescriptor(14, 12),
+		StepperDriver::A4988::PinoutDescriptor(2, 15),
+		500	// Vitesse en steps/seconde.
 	);
 
+	// bridge.setOpenAngle sert à configurer l'angle d'ouverture. Augmenter si n'ouvre pas assez et diminuer si ouvre trop. Modifier le coefficient devant REVOLUTION_ANGLE dans la définition de REVOLUTION_ANGLE;
+	bridge.setOpenAngle(PI);
+>>>>>>> 204f12869fc6c55c07dd7760a5a6838d26f1fd86
 	bridge.open();
 	delay(5000);
 	bridge.close();
 */
+
+	// initialize the switch pin as an input:
+	//pinMode(sensA.getPinE(), INPUT);
+	//pinMode(sensA.getPinS(), INPUT);
+	// pinMode(sensB.getPinE(), INPUT);
+	// pinMode(sensB.getPinS(), INPUT);
+	//Serial.println("done");
 }
 
-void loop() {}
+void loop() {
+	// --- Switch ---
+	//Add or substract a car to the bridge
+	//sensA.change(digitalRead(sensA.getPinE()),digitalRead(sensA.getPinS()));
+	//sensB.change(digitalRead(sensB.getPinE()),digitalRead(sensB.getPinS()));
+	//Serial.println(digitalRead(15));
+    //debugPrintln(digitalRead(sensA.getPinE())); 
+
+	//delay(100);
+
+	  // Set motor direction clockwise
+
+  // Spin motor slowly
+	digitalWrite(dirPin, HIGH);
+	digitalWrite(dirPin2, HIGH);
+
+  for(int x = 0; x < stepsPerRevolution; x++)
+  {
+    digitalWrite(stepPin, HIGH);
+    digitalWrite(stepPin2, HIGH);
+    delayMicroseconds(1000);
+    digitalWrite(stepPin, LOW);
+    digitalWrite(stepPin2, LOW);
+    delayMicroseconds(1000);
+  }
+  delay(1000); // Wait a second
+  
+  // Set motor direction counterclockwise
+  digitalWrite(dirPin, LOW);
+  digitalWrite(dirPin2, LOW);
+
+  // Spin motor quickly
+  for(int x = 0; x < stepsPerRevolution; x++)
+  {
+    digitalWrite(stepPin, HIGH);
+    digitalWrite(stepPin2, HIGH);
+    delayMicroseconds(1000);
+    digitalWrite(stepPin, LOW);
+    digitalWrite(stepPin2, LOW);
+    delayMicroseconds(1000);
+  }
+  delay(1000); // Wait a 
+}

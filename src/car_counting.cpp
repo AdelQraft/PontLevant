@@ -14,8 +14,9 @@ void CarCounting :: add(int state){
   //  Serial.println(this->lastButtonStateE != state);
     //Serial.println(state);
     if(this->lastButtonStateE == HIGH && this->lastButtonStateE != state){
-        this->carNumber = this->carNumber+1; 
-        Serial.println(this->carNumber);
+        this->carNumber = this->carNumber+1;
+        debugPrintln(this->carNumber); 
+        //Serial.println(this->carNumber);
        // Serial.println(lastButtonStateE);
     }
     this->lastButtonStateE = state;
@@ -24,7 +25,8 @@ void CarCounting :: add(int state){
 void CarCounting :: substract(int state){
     if (this->lastButtonStateS == HIGH && this->lastButtonStateS != state){
         this->carNumber--;
-        Serial.println(this->carNumber);
+        //Serial.println(this->carNumber);
+        debugPrintln(this->carNumber); 
 
     }
     this->lastButtonStateS = state;
