@@ -31,24 +31,29 @@ namespace StepperDriver {
 		pinMode(dirPin, OUTPUT);
 
 		setRevolutionSteps(revolutionSteps);
-		setSpeed(speed);
+		setSpeedStep(speed);
 	}
 
 	void A4988::setCurrentStep(int_fast32_t step) {
-		currentStep = step;
+		IStepperDriver::setCurrentStep(step);
 		updateDirection();
 	}
 
 	void A4988::setTargetStep(int_fast32_t step) {
-		targetStep = step;
+		IStepperDriver::setTargetAngle(step);
 		updateDirection();
 	}
 
-	uint_fast32_t A4988::getSpeed() const {
+	void A4988::setRevolutionSteps(uint_fast32_t steps) {
+		IStepperDriver::setRevolutionSteps(steps);
+		updateDirection();
+	}
+
+	uint_fast32_t A4988::getSpeedStep() const {
 		return speed;
 	}
 
-	void A4988::setSpeed(delay_t speed) {
+	void A4988::setSpeedStep(uint_fast32_t speed) {
 		assert(speed != 0);
 		this->speed = speed;
 	}
@@ -56,7 +61,7 @@ namespace StepperDriver {
 	void A4988::run() {
 		if (targetStep == currentStep) return;
 
-		delay_t halfSpeedDelay = static_cast<delay_t>(1e6) / speed / 2;
+		uint_fast32_t halfSpeedDelay = static_cast<uint_fast32_t>(1e6) / speed / 2;
 		debugPrintf("targetStep: %d, currentStep: %d, halfSpeedDelay: %d, stepPin: %d, dirPin: %d, speed: %d\n", targetStep, currentStep, halfSpeedDelay, stepPin, dirPin, speed);
 
 		do {
@@ -64,7 +69,9 @@ namespace StepperDriver {
 			delayMicroseconds(halfSpeedDelay);
 			digitalWrite(stepPin, LOW);
 			delayMicroseconds(halfSpeedDelay);
+
 			debugPrintln(currentStep);
+
 			currentStep += increment;
 		} while (currentStep != targetStep);
 	}

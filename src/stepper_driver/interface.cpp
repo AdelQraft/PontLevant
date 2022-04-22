@@ -55,4 +55,12 @@ namespace StepperDriver {
 	float IStepperDriver::stepToAngle(int_fast32_t step) const {
 		return step / angleScale;
 	}
+
+	float IStepperDriver::getSpeedAngle() const {
+		return angleScale * getSpeedStep();
+	}
+
+	void IStepperDriver::setSpeedAngle(float speed) {
+		setSpeedStep(angleToStep(speed));
+	}
 }
