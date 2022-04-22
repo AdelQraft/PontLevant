@@ -18,6 +18,7 @@ class CarCounting{
         bool isEmpty();
         int getPinE();
         int getPinS();
+        int getCarNumber();
 
 };
 
