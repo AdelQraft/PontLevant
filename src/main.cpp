@@ -1,14 +1,12 @@
 #include <Arduino.h>
-//#include <ESP8266WiFi.h>
-//#include <BlynkSimpleEsp8266.h>
-
-#include "car_counting.hpp"
-#include "boat_detection.hpp"
 
 #include "movable_bridge.hpp"
 #include "stepper_driver/a4988.hpp"
 
-#include "debugging.hpp"
+constexpr uint8_t STEP_PIN = 12;
+constexpr uint8_t DIR_PIN = 14;
+
+constexpr int_fast32_t REVOLUTION_STEPS = 200;
 
 /*
 constexpr uint8_t PIN_ENTER_A = 15,PIN_ENTER_B = 2, PIN_EXIT_A=13, PIN_EXIT_B=2;
@@ -18,7 +16,7 @@ int durationA, durationB;
 CarCounting sensA(PIN_ENTER_A,PIN_EXIT_A), sensB(PIN_ENTER_B,PIN_EXIT_B);
 BoatDectection detectionA(TRIG_PIN_A,ECHO_PIN_A), detectionB(TRIG_PIN_B,ECHO_PIN_B);
 */
-//constexpr uint8_t PIN_ENTER_A = 33, PIN_EXIT_A = 32;
+constexpr uint8_t PIN_ENTER_A = 26, PIN_EXIT_A = 27;
 //CarCounting sensA(PIN_ENTER_A,PIN_EXIT_A);
 
 void setup() {
@@ -40,6 +38,11 @@ void setup() {
 	bridge.open();
 	delay(5000);
 	bridge.close();
+	bridge.open();
+	delay(5000);
+	bridge.close();
+*/
+>>>>>>> f35a0966dde310a6d17a0f7098e5e739b10ca747
 
 	// initialize the switch pin as an input:
 	//pinMode(sensA.getPinE(), INPUT);
