@@ -7,6 +7,8 @@
 #include <type_traits>
 #include <thread>
 
+#include "debugging.hpp"
+
 template<typename StepperDriverT1, typename StepperDriverT2>
 class MovableBridge {
 	static_assert(std::is_base_of<StepperDriver::IStepperDriver, StepperDriverT1>::value, "StepperDriverT1 must inherit from StepperDriver::IStepperDriver");
@@ -20,7 +22,6 @@ private:
 	float openAngle;
 
 	void run() {
-		s1.run();
 		std::thread t1(&StepperDriverT1::run, &s1);
 		std::thread t2(&StepperDriverT2::run, &s2);
 		t1.join();
