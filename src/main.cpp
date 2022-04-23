@@ -16,21 +16,19 @@ BoatDectection detectionA(TRIG_PIN_A,ECHO_PIN_A), detectionB(TRIG_PIN_B,ECHO_PIN
 //constexpr uint8_t PIN_ENTER_A = 26, PIN_EXIT_A = 27;
 //CarCounting sensA(PIN_ENTER_A,PIN_EXIT_A);
 
+// bridge.setOpenAngle sert à configurer l'angle d'ouverture. Augmenter si n'ouvre pas assez et diminuer si ouvre trop. Modifier le coefficient devant REVOLUTION_ANGLE dans la définition de REVOLUTION_ANGLE;
+MovableBridge<StepperDriver::A4988, StepperDriver::A4988> bridge (
+	StepperDriver::A4988::PinoutDescriptor(12, 14),
+	200,
+	StepperDriver::A4988::PinoutDescriptor(34, 35),
+	200
+);
+
 void setup() {
 	debugInit();
 	// Objet pont levant
-	MovableBridge<StepperDriver::A4988, StepperDriver::A4988> bridge (
-		StepperDriver::A4988::PinoutDescriptor(12, 14),
-		200,
-		StepperDriver::A4988::PinoutDescriptor(34, 35),
-		200
-	);
 
-	// bridge.setOpenAngle sert à configurer l'angle d'ouverture. Augmenter si n'ouvre pas assez et diminuer si ouvre trop. Modifier le coefficient devant REVOLUTION_ANGLE dans la définition de REVOLUTION_ANGLE;
 	bridge.setOpenAngle(15*2*PI);
-	bridge.open();	// À configurer avec ALIVEcode.
-	delay(5000);
-	bridge.close(); // À configurer avec ALIVEcode.
 
 	// initialize the switch pin as an input:
 	//pinMode(sensA.getPinE(), INPUT);
@@ -41,6 +39,10 @@ void setup() {
 }
 
 void loop() {
+	bridge.open();	// À configurer avec ALIVEcode.
+	delay(5000);
+	bridge.close(); // À configurer avec ALIVEcode.
+
 	// --- Switch ---
 	//Add or substract a car to the bridge
 	//sensA.change(digitalRead(sensA.getPinE()),digitalRead(sensA.getPinS()));

@@ -21,10 +21,10 @@ private:
 
 	void run() {
 		s1.run();
-		//std::thread t1(&StepperDriverT1::run, &s1);
-		//std::thread t2(&StepperDriverT2::run, &s2);
-		//t1.join();
-		//t2.join();
+		std::thread t1(&StepperDriverT1::run, &s1);
+		std::thread t2(&StepperDriverT2::run, &s2);
+		t1.join();
+		t2.join();
 	}
 public:
 	using PinoutDescriptor1 = typename StepperDriverT1::PinoutDescriptor;
