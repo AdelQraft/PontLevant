@@ -19,10 +19,7 @@ public:
 		PinoutDescriptor(uint8_t stepPin, uint8_t dirPin);
 	};
 
-	static constexpr uint32_t DEFAULT_SPEED = 100;
-	static constexpr uint_fast32_t REVOLUTION_STEPS = 200;
-
-	A4988(const PinoutDescriptor&, uint_fast32_t revolutionSteps, uint32_t speed = DEFAULT_SPEED);
+	A4988(const PinoutDescriptor&, uint_fast32_t revolutionSteps, float speedAngle = 4*PI);
 	void setCurrentStep(int_fast32_t) override;
 	void setTargetStep(int_fast32_t) override;
 

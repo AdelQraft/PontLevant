@@ -24,7 +24,7 @@ public:
 	uint_fast32_t getRevolutionSteps() const;
 	virtual void setRevolutionSteps(uint_fast32_t);
 
-	int_fast32_t angleToStep(int_fast32_t) const;
+	int_fast32_t angleToStep(float) const;
 	virtual float stepToAngle(int_fast32_t) const;
 
 	virtual uint_fast32_t getSpeedStep() const = 0;

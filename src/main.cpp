@@ -5,11 +5,6 @@
 
 #include "debugging.hpp"
 
-constexpr uint8_t STEP_PIN = 12;
-constexpr uint8_t DIR_PIN = 14;
-
-constexpr int_fast32_t REVOLUTION_STEPS = 200;
-
 /*
 constexpr uint8_t PIN_ENTER_A = 15,PIN_ENTER_B = 2, PIN_EXIT_A=13, PIN_EXIT_B=2;
 constexpr uint8_t TRIG_PIN_A=18, ECHO_PIN_A=19,TRIG_PIN_B=2, ECHO_PIN_B=2;
@@ -18,28 +13,24 @@ int durationA, durationB;
 CarCounting sensA(PIN_ENTER_A,PIN_EXIT_A), sensB(PIN_ENTER_B,PIN_EXIT_B);
 BoatDectection detectionA(TRIG_PIN_A,ECHO_PIN_A), detectionB(TRIG_PIN_B,ECHO_PIN_B);
 */
-constexpr uint8_t PIN_ENTER_A = 26, PIN_EXIT_A = 27;
+//constexpr uint8_t PIN_ENTER_A = 26, PIN_EXIT_A = 27;
 //CarCounting sensA(PIN_ENTER_A,PIN_EXIT_A);
 
 void setup() {
 	debugInit();
-
-//	StepperDriver::A4988 s(StepperDriver::A4988::PinoutDescriptor(14, 12), 200, 20);
-//	s.setTargetAngle(2 * PI);
-//	s.run();
-
 	// Objet pont levant
 	MovableBridge<StepperDriver::A4988, StepperDriver::A4988> bridge (
-		StepperDriver::A4988::PinoutDescriptor(14, 12),
-		StepperDriver::A4988::PinoutDescriptor(2, 15),
-		500	// Vitesse en steps/seconde.
+		StepperDriver::A4988::PinoutDescriptor(12, 14),
+		200,
+		StepperDriver::A4988::PinoutDescriptor(34, 35),
+		200
 	);
 
 	// bridge.setOpenAngle sert à configurer l'angle d'ouverture. Augmenter si n'ouvre pas assez et diminuer si ouvre trop. Modifier le coefficient devant REVOLUTION_ANGLE dans la définition de REVOLUTION_ANGLE;
-	bridge.setOpenAngle(20*2*PI);
-	bridge.open();
+	bridge.setOpenAngle(15*2*PI);
+	bridge.open();	// À configurer avec ALIVEcode.
 	delay(5000);
-	bridge.close();
+	bridge.close(); // À configurer avec ALIVEcode.
 
 	// initialize the switch pin as an input:
 	//pinMode(sensA.getPinE(), INPUT);
