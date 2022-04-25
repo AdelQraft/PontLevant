@@ -62,4 +62,8 @@ namespace StepperDriver {
 	void IStepperDriver::setSpeedAngle(float speed) {
 		setSpeedStep(angleToStep(speed));
 	}
+
+	bool IStepperDriver::isOpen(void) const {
+		return targetStep == currentStep;
+	}
 }

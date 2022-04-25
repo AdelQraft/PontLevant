@@ -8,7 +8,7 @@
 namespace StepperDriver {
 class IStepperDriver {
 protected:
-	int_fast32_t currentStep = 0, targetStep;
+	int_fast32_t currentStep = 0, targetStep = 0;
 	float angleScale;
 public:
 	int_fast32_t getCurrentStep() const;
@@ -34,6 +34,9 @@ public:
 	void setSpeedAngle(float);
 
 	virtual void run() = 0;
+	virtual void nextStep() = 0;
+
+	bool isOpen() const;
 };
 } // namespace StepperDriver
 

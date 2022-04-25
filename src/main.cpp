@@ -20,7 +20,7 @@ BoatDectection detectionA(TRIG_PIN_A,ECHO_PIN_A), detectionB(TRIG_PIN_B,ECHO_PIN
 MovableBridge<StepperDriver::A4988, StepperDriver::A4988> bridge (
 	StepperDriver::A4988::PinoutDescriptor(12, 14),
 	200,
-	StepperDriver::A4988::PinoutDescriptor(34, 35),
+	StepperDriver::A4988::PinoutDescriptor(33, 32),
 	200
 );
 
@@ -28,7 +28,7 @@ void setup() {
 	debugInit();
 	// Objet pont levant
 
-	bridge.setOpenAngle(15*2*PI);
+	bridge.setOpenAngle(10*2*PI);
 
 	// initialize the switch pin as an input:
 	//pinMode(sensA.getPinE(), INPUT);
@@ -36,12 +36,14 @@ void setup() {
 	// pinMode(sensB.getPinE(), INPUT);
 	// pinMode(sensB.getPinS(), INPUT);
 	//Serial.println("done");
+	bridge.open();
+	bridge.close();
 }
 
 void loop() {
-	bridge.open();	// À configurer avec ALIVEcode.
+	// bridge.open();	// À configurer avec ALIVEcode.
 	delay(5000);
-	bridge.close(); // À configurer avec ALIVEcode.
+	// bridge.close(); // À configurer avec ALIVEcode.
 
 	// --- Switch ---
 	//Add or substract a car to the bridge

@@ -64,14 +64,37 @@ namespace StepperDriver {
 		uint_fast32_t halfSpeedDelay = static_cast<uint_fast32_t>(1e6) / speed / 2;
 		debugPrintf("targetStep: %d, currentStep: %d, increment: %d, halfSpeedDelay: %d, stepPin: %d, dirPin: %d, speed: %u\n", targetStep, currentStep, increment, halfSpeedDelay, stepPin, dirPin, speed);
 
+		int cptr = 0;
+
 		do {
+			if (cptr % 7 == 0) {
+				yield();
+			}
 			digitalWrite(stepPin, HIGH);
 			delayMicroseconds(halfSpeedDelay);
 			digitalWrite(stepPin, LOW);
 			delayMicroseconds(halfSpeedDelay);
 
 			currentStep += increment;
+			cptr++;
 		} while (currentStep != targetStep);
+		debugPrintf("I'M DONE YEAH!");
+	}
+
+	void A4988::nextStep(void) {
+		if (targetStep == currentStep) return;
+
+		uint_fast32_t halfSpeedDelay = static_cast<uint_fast32_t>(1e6) / speed / 2;
+		debugPrintf("targetStep: %d, currentStep: %d, increment: %d, halfSpeedDelay: %d, stepPin: %d, dirPin: %d, speed: %u\n", targetStep, currentStep, increment, halfSpeedDelay, stepPin, dirPin, speed);
+
+		// do {
+			digitalWrite(stepPin, HIGH);
+			delayMicroseconds(halfSpeedDelay);
+			digitalWrite(stepPin, LOW);
+			delayMicroseconds(halfSpeedDelay);
+
+			currentStep += increment;
+		// } while (currentStep != targetStep);
 	}
 
 	A4988::PinoutDescriptor::PinoutDescriptor(uint8_t stepPin, uint8_t dirPin)
