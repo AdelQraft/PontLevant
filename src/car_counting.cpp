@@ -47,6 +47,11 @@ int CarCounting ::getPinS()
     return this->pinS;
 }
 
+int CarCounting ::getCarNumber()
+{
+    return this->carNumber;
+}
+
 void CarCounting::change(int stateE, int stateS)
 {
     this->add(stateE);

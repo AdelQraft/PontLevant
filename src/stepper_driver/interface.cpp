@@ -1,13 +1,12 @@
 #include "stepper_driver/interface.hpp"
 
 #include <Arduino.h>
-#include <cmath>
 
-constexpr float REVOLUTION_ANGLE_RAD = 2 * PI;
+#include "debugging.hpp"
+
+constexpr float REVOLUTION_ANGLE_RAD = 2*PI;
 
 namespace StepperDriver {
-	// Base interface IStepperDriver
-
 	int_fast32_t IStepperDriver::getCurrentStep() const {
 		return currentStep;
 	}
@@ -44,15 +43,27 @@ namespace StepperDriver {
 		return angleScale * REVOLUTION_ANGLE_RAD;
 	}
 
-	void IStepperDriver::setRevolutionSteps(uint_fast32_t revolSteps) {
-		angleScale = revolSteps / REVOLUTION_ANGLE_RAD;
+	void IStepperDriver::setRevolutionSteps(uint_fast32_t revolutionSteps) {
+		angleScale = revolutionSteps / REVOLUTION_ANGLE_RAD;
 	};
 
-	int_fast32_t IStepperDriver::angleToStep(int_fast32_t angle) const {
+	int_fast32_t IStepperDriver::angleToStep(float angle) const {
 		return angleScale * angle;
 	}
 
 	float IStepperDriver::stepToAngle(int_fast32_t step) const {
 		return step / angleScale;
+	}
+
+	float IStepperDriver::getSpeedAngle() const {
+		return angleScale * getSpeedStep();
+	}
+
+	void IStepperDriver::setSpeedAngle(float speed) {
+		setSpeedStep(angleToStep(speed));
+	}
+
+	bool IStepperDriver::isOpen(void) const {
+		return targetStep == currentStep;
 	}
 }

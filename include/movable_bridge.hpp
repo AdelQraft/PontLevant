@@ -4,51 +4,91 @@
 #include <Arduino.h>
 #include "stepper_driver/interface.hpp"
 
-#ifdef _ESP
 #include <type_traits>
-#endif
+#include <thread>
+#include <atomic>
+//#include <pthread.h>
 
-template<typename StepperDriverT1, typename StepperDriverT2>
-class MovableBridge {
-#ifdef _ESP
+#include "debugging.hpp"
+
+template <typename StepperDriverT1, typename StepperDriverT2>
+class MovableBridge
+{
 	static_assert(std::is_base_of<StepperDriver::IStepperDriver, StepperDriverT1>::value, "StepperDriverT1 must inherit from StepperDriver::IStepperDriver");
-	static_assert(std::is_base_of<StepperDriver::IStepperDriver, StepperDriverT2>::value, "StepperDriverT2 must inherit from StepperDriver::IStepperDriver"); 
-#endif
+	static_assert(std::is_base_of<StepperDriver::IStepperDriver, StepperDriverT2>::value, "StepperDriverT2 must inherit from StepperDriver::IStepperDriver");
+
 private:
-#	define callSteppersMethod(method, ...) { s1.method(__VA_ARGS__); s2.method(__VA_ARGS__); }	// Warning! Unsafe macro! Doesn't prevent expansion!
+#define callSteppersMethod(method, ...) \
+	stepperDriver1.method(__VA_ARGS__);   \
+	stepperDriver2.method(__VA_ARGS__); // Warning! Unsafe macro! Doesn't prevent expansion!
 
-	StepperDriverT1 s1;
-	StepperDriverT2 s2;
+	StepperDriverT1 stepperDriver1;
+	StepperDriverT2 stepperDriver2;
 
-	int_fast32_t openAngle;
+	float openAngle;
 
-	void run() {
-		debugPrintf("Run -- currentAngle: %d, targetAngle: %d\n", s1.getCurrentAngle(), openAngle);
+	template <typename StepperDriverT>
+	static void runCallback(StepperDriverT &stepperDriver, std::atomic<bool> &hasThreadFinished)
+	{
+		hasThreadFinished = false;
+		stepperDriver.run();
+		delay(40000);
+		hasThreadFinished = true;
+	}
 
-		const int_fast32_t targetAngle = s1.getTargetAngle();
-		while (s1.getCurrentAngle() != targetAngle) {
-			s1.step();
-			s2.step();
+	void run2()
+	{
+		while (!stepperDriver1.isOpen() || !stepperDriver2.isOpen())
+		{
+			if (!stepperDriver1.isOpen())
+				stepperDriver1.nextStep();
+			if (!stepperDriver2.isOpen())
+				stepperDriver2.nextStep();
 		}
 	}
+
+	void run()
+	{
+		// std::atomic<bool> hasThreadFinished;
+		// std::thread t1(&runCallback<StepperDriverT1>, std::ref(stepperDriver1), std::ref(hasThreadFinished));
+		// while (!hasThreadFinished);
+		std::thread t1(&StepperDriverT1::run, &stepperDriver1);
+		std::thread t2(&StepperDriverT2::run, &stepperDriver2);
+		// delay(60000);
+		t1.join();
+		t2.join();
+		// delay(10000);
+		// t2.join();
+	}
+
 public:
 	using PinoutDescriptor1 = typename StepperDriverT1::PinoutDescriptor;
 	using PinoutDescriptor2 = typename StepperDriverT2::PinoutDescriptor;
 
-	int_fast32_t getOpenAngle() const { return openAngle; };
-	void setOpenAngle(int_fast32_t angle) { openAngle = angle; }
-	uint32_t getSpeed() const { return s1.getSpeed(); };
-	void setSpeed(int_fast32_t speed) { callSteppersMethod(setSpeed, speed); }
+	float getOpenAngle() const { return openAngle; }
+	void setOpenAngle(float angle) { openAngle = angle; }
+	uint_fast32_t getSpeedAngle() const { return stepperDriver1.getSpeedAngle(); } // Remember, stepperDriver1.getSpeed() == stepperDriver2.getSpeed().
+	void setSpeedAngle(uint_fast32_t speed) { callSteppersMethod(setSpeedAngle, speed); }
 
-	MovableBridge(const PinoutDescriptor1& pd1, const PinoutDescriptor2& pd2, uint_fast32_t speed = StepperDriverT1::DEFAULT_SPEED)
-		: s1(pd1, speed), s2(pd2, speed) {}
+	MovableBridge(const typename StepperDriverT1::PinoutDescriptor &pd1, uint_fast32_t stepper1RevolutionSteps, const typename StepperDriverT2::PinoutDescriptor &pd2, uint_fast32_t stepper2RevolutionSteps, float speed = 4 * PI)
+			: stepperDriver1(pd1, stepper1RevolutionSteps, speed), stepperDriver2(pd2, stepper2RevolutionSteps, speed) {}
 
-	void open() { callSteppersMethod(setTargetAngle, openAngle); run(); }
+	void open()
+	{
+		webSocket.sendTXT("{\"event\": \"update_doc\",\"data\": {\"fields\": {\"/document/pont/ouvert\": true}}}");
+		callSteppersMethod(setTargetAngle, openAngle);
+		run();
+	}
 
-	void close() { callSteppersMethod(setTargetAngle, 0); run(); }
+	void close()
+	{
+		callSteppersMethod(setTargetAngle, 0);
+		run();
+		webSocket.sendTXT("{\"event\": \"update_doc\",\"data\": {\"fields\": {\"/document/pont/ouvert\": false}}}");
+	}
 
 private:
-#	undef callSteppersMethod
+#undef callSteppersMethod
 };
 
 #endif

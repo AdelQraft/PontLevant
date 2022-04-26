@@ -28,6 +28,18 @@ const int stepPin = 14;
 const int dirPin2 = 15;
 const int stepPin2 = 2;
 const int stepsPerRevolution = 3200;
+CarCounting sensA(PIN_ENTER_A, PIN_EXIT_A), sensB(PIN_ENTER_B, PIN_EXIT_B);
+BoatDectection detectionA(TRIG_PIN_A, ECHO_PIN_A), detectionB(TRIG_PIN_B, ECHO_PIN_B);
+
+// constexpr uint8_t PIN_ENTER_A = 26, PIN_EXIT_A = 27;
+// CarCounting sensA(PIN_ENTER_A,PIN_EXIT_A);
+
+// bridge.setOpenAngle sert à configurer l'angle d'ouverture. Augmenter si n'ouvre pas assez et diminuer si ouvre trop. Modifier le coefficient devant REVOLUTION_ANGLE dans la définition de REVOLUTION_ANGLE;
+MovableBridge<StepperDriver::A4988, StepperDriver::A4988> bridge(
+		StepperDriver::A4988::PinoutDescriptor(12, 14),
+		200,
+		StepperDriver::A4988::PinoutDescriptor(33, 32),
+		200);
 
 WebSocketsClient webSocket;
 // WiFiClient client;
@@ -97,44 +109,6 @@ void wait(uint16_t waitTime)
 	}
 }
 
-void open()
-{
-	webSocket.sendTXT("{\"event\": \"update_doc\",\"data\": {\"fields\": {\"/document/pont/ouvert\": true}}}");
-	// Set motor direction clockwise
-	digitalWrite(dirPin, HIGH);
-	digitalWrite(dirPin2, HIGH);
-
-	for (int x = 0; x < stepsPerRevolution; x++)
-	{
-		digitalWrite(stepPin, HIGH);
-		digitalWrite(stepPin2, HIGH);
-		delayMicroseconds(1000);
-		digitalWrite(stepPin, LOW);
-		digitalWrite(stepPin2, LOW);
-		delayMicroseconds(1000);
-		webSocket.loop();
-	}
-}
-
-void close()
-{
-	// Set motor direction clockwise
-	digitalWrite(dirPin, LOW);
-	digitalWrite(dirPin2, LOW);
-
-	for (int x = 0; x < stepsPerRevolution; x++)
-	{
-		digitalWrite(stepPin, HIGH);
-		digitalWrite(stepPin2, HIGH);
-		delayMicroseconds(1000);
-		digitalWrite(stepPin, LOW);
-		digitalWrite(stepPin2, LOW);
-		delayMicroseconds(1000);
-		webSocket.loop();
-	}
-	webSocket.sendTXT("{\"event\": \"update_doc\",\"data\": {\"fields\": {\"/document/pont/ouvert\": false}}}");
-}
-
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 {
 	switch (type)
@@ -194,10 +168,10 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 			switch (actionId)
 			{
 			case 0:
-				close();
+				bridge.close();
 				break;
 			case 1:
-				open();
+				bridge.open();
 				break;
 			}
 			Serial.println("DONE");
@@ -264,19 +238,7 @@ void setup()
 	webSocket.setReconnectInterval(7000);
 
 	// Objet pont levant
-	/*
-		MovableBridge<StepperDriver::A4988, StepperDriver::A4988> bridge (
-			StepperDriver::A4988::PinoutDescriptor(14, 12),
-			StepperDriver::A4988::PinoutDescriptor(2, 15),
-			500	// Vitesse en steps/seconde.
-		);
-
-		// bridge.setOpenAngle sert à configurer l'angle d'ouverture. Augmenter si n'ouvre pas assez et diminuer si ouvre trop. Modifier le coefficient devant REVOLUTION_ANGLE dans la définition de REVOLUTION_ANGLE;
-		bridge.setOpenAngle(PI);
-		bridge.open();
-		delay(5000);
-		bridge.close();
-	*/
+	bridge.setOpenAngle(10 * 2 * PI);
 }
 
 void loop()
@@ -287,5 +249,6 @@ void loop()
 	sensB.change(digitalRead(sensB.getPinE()), digitalRead(sensB.getPinS()));
 	// Serial.println(digitalRead(15));
 	// debugPrintln(digitalRead(sensA.getPinE()));
+
 	webSocket.loop();
 }
