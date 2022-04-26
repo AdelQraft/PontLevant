@@ -12,8 +12,8 @@
 
 #include "debugging.hpp"
 
-const char *ssid = "Jihene";
-const char *password = "salimsarah";
+const char *ssid = "robot03";
+const char *password = "alive160";
 
 constexpr uint8_t PIN_ENTER_A = 15, PIN_ENTER_B = 2, PIN_EXIT_A = 13, PIN_EXIT_B = 2;
 constexpr uint8_t TRIG_PIN_A = 18, ECHO_PIN_A = 19, TRIG_PIN_B = 2, ECHO_PIN_B = 2;
@@ -28,8 +28,6 @@ const int stepPin = 14;
 const int dirPin2 = 15;
 const int stepPin2 = 2;
 const int stepsPerRevolution = 3200;
-CarCounting sensA(PIN_ENTER_A, PIN_EXIT_A), sensB(PIN_ENTER_B, PIN_EXIT_B);
-BoatDectection detectionA(TRIG_PIN_A, ECHO_PIN_A), detectionB(TRIG_PIN_B, ECHO_PIN_B);
 
 // constexpr uint8_t PIN_ENTER_A = 26, PIN_EXIT_A = 27;
 // CarCounting sensA(PIN_ENTER_A,PIN_EXIT_A);
@@ -169,8 +167,10 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 			{
 			case 0:
 				bridge.close();
+				webSocket.sendTXT("{\"event\": \"update_doc\",\"data\": {\"fields\": {\"/document/pont/ouvert\": false}}}");
 				break;
 			case 1:
+				webSocket.sendTXT("{\"event\": \"update_doc\",\"data\": {\"fields\": {\"/document/pont/ouvert\": true}}}");
 				bridge.open();
 				break;
 			}
@@ -206,6 +206,22 @@ void setup()
 {
 	debugInit();
 
+	WiFi.begin(ssid, password);
+
+	uint32_t notConnectedCounter = 0;
+	while (WiFi.status() != WL_CONNECTED)
+	{
+		delay(1000);
+		Serial.print(".");
+		notConnectedCounter++;
+		if (notConnectedCounter > 10)
+		{ // Reset board if not connected after 10s
+			Serial.println("Resetting due to Wifi not connecting...");
+			ESP.restart();
+		}
+	}
+	Serial.println("Connection au reseau reussie!");
+
 	pinMode(stepPin, OUTPUT);
 	pinMode(dirPin, OUTPUT);
 
@@ -217,17 +233,6 @@ void setup()
 	pinMode(sensA.getPinS(), INPUT);
 	pinMode(sensB.getPinE(), INPUT);
 	pinMode(sensB.getPinS(), INPUT);
-
-	WiFi.begin(ssid, password);
-
-	while (WiFi.status() != WL_CONNECTED)
-	{
-		delay(500);
-		Serial.print(".");
-	}
-
-	Serial.println("Connection au reseau reussie!");
-
 	// event handler
 	webSocket.onEvent(webSocketEvent);
 

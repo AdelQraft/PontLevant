@@ -47,16 +47,55 @@ private:
 		}
 	}
 
+	void openBoth()
+	{
+
+		uint_fast32_t halfSpeedDelay1 = static_cast<uint_fast32_t>(1e6) / stepperDriver1.speed / 2;
+		uint_fast32_t halfSpeedDelay2 = static_cast<uint_fast32_t>(1e6) / stepperDriver2.speed / 2;
+
+		// debugPrintf("targetStep: %d, currentStep: %d, increment: %d, halfSpeedDelay: %d, stepPin: %d, dirPin: %d, speed: %u\n", targetStep, currentStep, increment, halfSpeedDelay, stepPin, dirPin, speed);
+
+		int cptr = 0;
+
+		do
+		{
+			if (cptr % 7 == 0)
+			{
+				yield();
+			}
+			if (stepperDriver1.targetStep != stepperDriver1.currentStep)
+			{
+				digitalWrite(stepperDriver1.stepPin, HIGH);
+				delayMicroseconds(halfSpeedDelay1);
+				digitalWrite(stepperDriver1.stepPin, LOW);
+				delayMicroseconds(halfSpeedDelay1);
+				stepperDriver1.currentStep += stepperDriver1.increment;
+			}
+
+			if (stepperDriver2.targetStep != stepperDriver2.currentStep)
+			{
+				digitalWrite(stepperDriver2.stepPin, HIGH);
+				delayMicroseconds(halfSpeedDelay2);
+				digitalWrite(stepperDriver2.stepPin, LOW);
+				delayMicroseconds(halfSpeedDelay2);
+				stepperDriver2.currentStep += stepperDriver2.increment;
+			}
+
+			cptr++;
+		} while (stepperDriver1.targetStep != stepperDriver1.currentStep && stepperDriver2.targetStep != stepperDriver2.currentStep);
+	}
+
 	void run()
 	{
 		// std::atomic<bool> hasThreadFinished;
 		// std::thread t1(&runCallback<StepperDriverT1>, std::ref(stepperDriver1), std::ref(hasThreadFinished));
 		// while (!hasThreadFinished);
-		std::thread t1(&StepperDriverT1::run, &stepperDriver1);
-		std::thread t2(&StepperDriverT2::run, &stepperDriver2);
-		// delay(60000);
-		t1.join();
-		t2.join();
+		// std::thread t1(&StepperDriverT1::run, &stepperDriver1);
+		// std::thread t2(&StepperDriverT2::run, &stepperDriver2);
+		// // delay(60000);
+		// t1.join();
+		// t2.join();
+		openBoth();
 		// delay(10000);
 		// t2.join();
 	}
@@ -75,7 +114,6 @@ public:
 
 	void open()
 	{
-		webSocket.sendTXT("{\"event\": \"update_doc\",\"data\": {\"fields\": {\"/document/pont/ouvert\": true}}}");
 		callSteppersMethod(setTargetAngle, openAngle);
 		run();
 	}
@@ -84,7 +122,6 @@ public:
 	{
 		callSteppersMethod(setTargetAngle, 0);
 		run();
-		webSocket.sendTXT("{\"event\": \"update_doc\",\"data\": {\"fields\": {\"/document/pont/ouvert\": false}}}");
 	}
 
 private:
