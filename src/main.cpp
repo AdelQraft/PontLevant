@@ -12,8 +12,8 @@
 
 #include "debugging.hpp"
 
-const char *ssid = "LRIMA_2.4";
-const char *password = "LRIMA_SWAG_24";
+const char *ssid = "Jihene";
+const char *password = "salimsarah";
 
 constexpr uint8_t PIN_ENTER_A = 15, PIN_ENTER_B = 2, PIN_EXIT_A = 13, PIN_EXIT_B = 2;
 constexpr uint8_t TRIG_PIN_A = 18, ECHO_PIN_A = 19, TRIG_PIN_B = 2, ECHO_PIN_B = 2;
@@ -99,6 +99,7 @@ void wait(uint16_t waitTime)
 
 void open()
 {
+	webSocket.sendTXT("{\"event\": \"update_doc\",\"data\": {\"fields\": {\"/document/pont/ouvert\": true}}}");
 	// Set motor direction clockwise
 	digitalWrite(dirPin, HIGH);
 	digitalWrite(dirPin2, HIGH);
@@ -111,6 +112,7 @@ void open()
 		digitalWrite(stepPin, LOW);
 		digitalWrite(stepPin2, LOW);
 		delayMicroseconds(1000);
+		webSocket.loop();
 	}
 }
 
@@ -128,7 +130,9 @@ void close()
 		digitalWrite(stepPin, LOW);
 		digitalWrite(stepPin2, LOW);
 		delayMicroseconds(1000);
+		webSocket.loop();
 	}
+	webSocket.sendTXT("{\"event\": \"update_doc\",\"data\": {\"fields\": {\"/document/pont/ouvert\": false}}}");
 }
 
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
@@ -281,8 +285,7 @@ void loop()
 	// Add or substract a car to the bridge
 	sensA.change(digitalRead(sensA.getPinE()), digitalRead(sensA.getPinS()));
 	sensB.change(digitalRead(sensB.getPinE()), digitalRead(sensB.getPinS()));
-	Serial.println(digitalRead(15));
-	debugPrintln(digitalRead(sensA.getPinE()));
-
-	delay(100);
+	// Serial.println(digitalRead(15));
+	// debugPrintln(digitalRead(sensA.getPinE()));
+	webSocket.loop();
 }
