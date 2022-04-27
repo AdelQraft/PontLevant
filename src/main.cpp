@@ -1,6 +1,6 @@
 #include <Arduino.h>
 //#include <WebSocketsClient.h>
-//#include <ArduinoJson.h>
+#include <ArduinoJson.h>
 //#include <ESP8266WiFi.h>
 //#include <BlynkSimpleEsp8266.h>
 
@@ -260,6 +260,9 @@ void setup()
 	bridge.setOpenAngle(10 * 2 * PI);
 }
 
+uint8_t nbCarsOnTheBridge = 0;
+uint8_t newNbCarsOnTheBridge = 0;
+
 void loop()
 {
 	// --- Switch ---
@@ -271,6 +274,22 @@ void loop()
 	Serial.print("B: ");
 	Serial.println(sensB.getCarNumber());
 
+	newNbCarsOnTheBridge = sensA.getCarNumber();
+	if (newNbCarsOnTheBridge != nbCarsOnTheBridge)
+	{
+		nbCarsOnTheBridge = newNbCarsOnTheBridge;
+
+		StaticJsonDocument<256> doc;
+		StaticJsonDocument<256> fields;
+		fields["/document/pont/cars"] = nbCarsOnTheBridge;
+		doc.clear();
+		doc["event"] = "update_doc";
+		doc["fields"] = fields;
+
+		char *txt;
+		serializeJson(doc, txt);
+		webSocket.sendTXT(txt);
+	}
 	// Serial.println(digitalRead(15));
 	// debugPrintln(digitalRead(sensA.getPinE()));
 
