@@ -15,6 +15,9 @@
 const char *ssid = "robot03";
 const char *password = "alive160";
 
+// const char *ssid = "LRIMA_2.4";
+// const char *password = "LRIMA_SWAG_24";
+
 constexpr uint8_t PIN_ENTER_A = 15, PIN_ENTER_B = 2, PIN_EXIT_A = 13, PIN_EXIT_B = 2;
 constexpr uint8_t TRIG_PIN_A = 18, ECHO_PIN_A = 19, TRIG_PIN_B = 2, ECHO_PIN_B = 2;
 int durationA, durationB;
@@ -252,8 +255,14 @@ void loop()
 	// Add or substract a car to the bridge
 	sensA.change(digitalRead(sensA.getPinE()), digitalRead(sensA.getPinS()));
 	sensB.change(digitalRead(sensB.getPinE()), digitalRead(sensB.getPinS()));
+	Serial.print("A: ");
+	Serial.println(sensA.getCarNumber());
+	Serial.print("B: ");
+	Serial.println(sensB.getCarNumber());
+
 	// Serial.println(digitalRead(15));
 	// debugPrintln(digitalRead(sensA.getPinE()));
 
 	webSocket.loop();
+	delay(100);
 }
