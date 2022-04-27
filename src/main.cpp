@@ -20,12 +20,12 @@ const char *password = "alive160";
 // const char *ssid = "LRIMA_2.4";
 // const char *password = "LRIMA_SWAG_24";
 
-constexpr uint8_t PIN_ENTER_A = 15, PIN_ENTER_B = 2, PIN_EXIT_A = 13, PIN_EXIT_B = 2;
-constexpr uint8_t TRIG_PIN_A = 18, ECHO_PIN_A = 19, TRIG_PIN_B = 2, ECHO_PIN_B = 2;
+constexpr uint8_t PIN_ENTER_A = 15, PIN_EXIT_A = 2;
+// constexpr uint8_t TRIG_PIN_A = 18, ECHO_PIN_A = 19, TRIG_PIN_B = 2, ECHO_PIN_B = 2;
 int durationA, durationB;
 
-CarCounting sensA(PIN_ENTER_A, PIN_EXIT_A), sensB(PIN_ENTER_B, PIN_EXIT_B);
-BoatDectection detectionA(TRIG_PIN_A, ECHO_PIN_A), detectionB(TRIG_PIN_B, ECHO_PIN_B);
+CarCounting sensA(PIN_ENTER_A, PIN_EXIT_A);
+// BoatDectection detectionA(TRIG_PIN_A, ECHO_PIN_A), detectionB(TRIG_PIN_B, ECHO_PIN_B);
 
 // constexpr uint8_t PIN_ENTER_A = 33, PIN_EXIT_A = 32;
 const int dirPin = 12;
@@ -220,7 +220,7 @@ void setup()
 {
 	debugInit();
 
-	WiFi.begin(ssid, password);
+	/*WiFi.begin(ssid, password);
 
 	uint32_t notConnectedCounter = 0;
 	while (WiFi.status() != WL_CONNECTED)
@@ -234,7 +234,7 @@ void setup()
 			ESP.restart();
 		}
 	}
-	Serial.println("Connection au reseau reussie!");
+	Serial.println("Connection au reseau reussie!");*/
 
 	pinMode(stepPin, OUTPUT);
 	pinMode(dirPin, OUTPUT);
@@ -245,16 +245,14 @@ void setup()
 	// initialize the switch pin as an input:
 	pinMode(sensA.getPinE(), INPUT);
 	pinMode(sensA.getPinS(), INPUT);
-	pinMode(sensB.getPinE(), INPUT);
-	pinMode(sensB.getPinS(), INPUT);
 	// event handler
-	webSocket.onEvent(webSocketEvent);
+	// webSocket.onEvent(webSocketEvent);
 
 	// server address, port and URL
-	webSocket.begin(host, port, path);
+	// webSocket.begin(host, port, path);
 
 	// try every 7000 again if connection has failed
-	webSocket.setReconnectInterval(7000);
+	// webSocket.setReconnectInterval(7000);
 
 	// Objet pont levant
 	bridge.setOpenAngle(10 * 2 * PI);
@@ -268,11 +266,8 @@ void loop()
 	// --- Switch ---
 	// Add or substract a car to the bridge
 	sensA.change(digitalRead(sensA.getPinE()), digitalRead(sensA.getPinS()));
-	sensB.change(digitalRead(sensB.getPinE()), digitalRead(sensB.getPinS()));
-	Serial.print("A: ");
+	Serial.print("Cars nb: ");
 	Serial.println(sensA.getCarNumber());
-	Serial.print("B: ");
-	Serial.println(sensB.getCarNumber());
 
 	newNbCarsOnTheBridge = sensA.getCarNumber();
 	if (newNbCarsOnTheBridge != nbCarsOnTheBridge)
@@ -286,7 +281,7 @@ void loop()
 		doc["event"] = "update_doc";
 		doc["fields"] = fields;
 
-		char *txt;
+		String txt;
 		serializeJson(doc, txt);
 		webSocket.sendTXT(txt);
 	}

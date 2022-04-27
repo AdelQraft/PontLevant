@@ -11,7 +11,7 @@
 
 #include "debugging.hpp"
 
-template<typename StepperDriverT1, typename StepperDriverT2>
+template <typename StepperDriverT1, typename StepperDriverT2>
 class MovableBridge
 {
     static_assert(std::is_base_of<StepperDriver::IStepperDriver, StepperDriverT1>::value,
@@ -21,7 +21,7 @@ class MovableBridge
 
 private:
 #define callSteppersMethod(method, ...) \
-    stepperDriver1.method(__VA_ARGS__);   \
+    stepperDriver1.method(__VA_ARGS__); \
     stepperDriver2.method(__VA_ARGS__); // Warning! Unsafe macro! Doesn't prevent expansion!
 
     StepperDriverT1 stepperDriver1;
@@ -29,7 +29,7 @@ private:
 
     float openAngle;
 
-    template<typename StepperDriverT>
+    template <typename StepperDriverT>
     static void runCallback(StepperDriverT &stepperDriver, std::atomic<bool> &hasThreadFinished)
     {
         hasThreadFinished = false;
@@ -64,11 +64,11 @@ private:
             {
                 yield();
             }
-            digitalWrite(stepperDriver1.stepPin, HIGH);
             digitalWrite(stepperDriver2.stepPin, HIGH);
+            digitalWrite(stepperDriver1.stepPin, HIGH);
             delayMicroseconds(halfSpeedDelay);
-            digitalWrite(stepperDriver1.stepPin, LOW);
             digitalWrite(stepperDriver2.stepPin, LOW);
+            digitalWrite(stepperDriver1.stepPin, LOW);
             delayMicroseconds(halfSpeedDelay);
 
             stepperDriver1.currentStep += stepperDriver1.increment;
@@ -84,11 +84,11 @@ private:
         // std::atomic<bool> hasThreadFinished;
         // std::thread t1(&runCallback<StepperDriverT1>, std::ref(stepperDriver1), std::ref(hasThreadFinished));
         // while (!hasThreadFinished);
-//        std::thread t1(&StepperDriverT1::run, &stepperDriver1);
-//        std::thread t2(&StepperDriverT2::run, &stepperDriver2);
+        //        std::thread t1(&StepperDriverT1::run, &stepperDriver1);
+        //        std::thread t2(&StepperDriverT2::run, &stepperDriver2);
         // // delay(60000);
-//        t1.join();
-//        t2.join();
+        //        t1.join();
+        //        t2.join();
         openBoth();
         // delay(10000);
         // t2.join();
@@ -99,21 +99,30 @@ public:
     using PinoutDescriptor2 = typename StepperDriverT2::PinoutDescriptor;
 
     float getOpenAngle() const
-    { return openAngle; }
+    {
+        return openAngle;
+    }
 
     void setOpenAngle(float angle)
-    { openAngle = angle; }
+    {
+        openAngle = angle;
+    }
 
     uint_fast32_t getSpeedAngle() const
-    { return stepperDriver1.getSpeedAngle(); } // Remember, stepperDriver1.getSpeed() == stepperDriver2.getSpeed().
+    {
+        return stepperDriver1.getSpeedAngle();
+    } // Remember, stepperDriver1.getSpeed() == stepperDriver2.getSpeed().
     void setSpeedAngle(uint_fast32_t speed)
-    { callSteppersMethod(setSpeedAngle, speed); }
+    {
+        callSteppersMethod(setSpeedAngle, speed);
+    }
 
     MovableBridge(const typename StepperDriverT1::PinoutDescriptor &pd1, uint_fast32_t stepper1RevolutionSteps,
                   const typename StepperDriverT2::PinoutDescriptor &pd2, uint_fast32_t stepper2RevolutionSteps,
                   float speed = 4 * PI)
-            : stepperDriver1(pd1, stepper1RevolutionSteps, speed), stepperDriver2(pd2, stepper2RevolutionSteps, speed)
-    {}
+        : stepperDriver1(pd1, stepper1RevolutionSteps, speed), stepperDriver2(pd2, stepper2RevolutionSteps, speed)
+    {
+    }
 
     void open()
     {
