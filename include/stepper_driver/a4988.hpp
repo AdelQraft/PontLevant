@@ -29,11 +29,11 @@ namespace StepperDriver
 
         void setRevolutionSteps(uint_fast32_t) override;
 
-        uint_fast32_t getSpeedStep(void) const override;
+        uint_fast32_t getSpeedStep() const override;
         void setSpeedStep(uint_fast32_t) override;
 
-        void nextStep(void);
-        void run(void);
+        void nextStep() override;
+        void run() override;
     };
 } // namespace StepperDriver
 

@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#include <WebSocketsClient.h>
-#include <ArduinoJson.h>
+//#include <WebSocketsClient.h>
+//#include <ArduinoJson.h>
 //#include <ESP8266WiFi.h>
 //#include <BlynkSimpleEsp8266.h>
 
@@ -11,6 +11,8 @@
 #include "stepper_driver/a4988.hpp"
 
 #include "debugging.hpp"
+#include "../lib/arduinoWebSockets-master/src/WebSocketsClient.h"
+#include "../lib/ArduinoJson/src/ArduinoJson.h"
 
 const char *ssid = "robot03";
 const char *password = "alive160";
@@ -67,7 +69,7 @@ bool readyToGo = false;
  *
  * @param eventName
  */
-void _sendEvent(const char *eventName, StaticJsonDocument<256> responseData)
+void _sendEvent(const char *eventName, const StaticJsonDocument<256> &responseData)
 {
 	StaticJsonDocument<256> doc;
 	doc["event"] = eventName;
@@ -120,7 +122,8 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 	case WStype_CONNECTED:
 	{
 		Serial.printf("[WSc] Connected to url: %s\n", payload);
-		webSocket.sendTXT("{\"event\": \"connect_object\", \"data\": { \"id\": \"27d8ec40-4504-459b-98d7-d32a36d92d5f\"}}");
+		webSocket.sendTXT(
+				R"({"event": "connect_object", "data": { "id": "27d8ec40-4504-459b-98d7-d32a36d92d5f"}})");
 		break;
 	}
 	case WStype_TEXT:
@@ -165,16 +168,20 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 		// TODO handle callbacks
 		if (event == EVT_ON_RECV)
 		{
-			byte actionId = doc["data"]["id"].as<byte>();
+			byte actionId = doc["data"]["id"];
 			switch (actionId)
 			{
 			case 0:
 				bridge.close();
-				webSocket.sendTXT("{\"event\": \"update_doc\",\"data\": {\"fields\": {\"/document/pont/ouvert\": false}}}");
+				webSocket.sendTXT(
+						R"({"event": "update_doc","data": {"fields": {"/document/pont/ouvert": false}}})");
 				break;
 			case 1:
-				webSocket.sendTXT("{\"event\": \"update_doc\",\"data\": {\"fields\": {\"/document/pont/ouvert\": true}}}");
+				webSocket.sendTXT(
+						R"({"event": "update_doc","data": {"fields": {"/document/pont/ouvert": true}}})");
 				bridge.open();
+				break;
+			default:
 				break;
 			}
 			Serial.println("DONE");
@@ -190,7 +197,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 		break;
 	}
 	case WStype_BIN:
-		Serial.printf("[WSc] get binary length: %u\n", length);
+		Serial.printf("[WSc] get binary length: %zu\n", length);
 		// hexdump(payload, length);
 
 		// send data to server
@@ -201,6 +208,10 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 	case WStype_FRAGMENT_BIN_START:
 	case WStype_FRAGMENT:
 	case WStype_FRAGMENT_FIN:
+		break;
+	case WStype_PING:
+		break;
+	case WStype_PONG:
 		break;
 	}
 }
