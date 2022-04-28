@@ -2,7 +2,7 @@
 
 CarCounting ::CarCounting(int pin1, int pin2)
 {
-    this->carNumber = 0;
+    this->pressureCount = 0;
     this->buttonState = 0;
     this->lastButtonStateE = 0;
     this->lastButtonStateS = 0;
@@ -16,8 +16,8 @@ void CarCounting ::add(int state)
     // Serial.println(state);
     if (this->lastButtonStateE == HIGH && this->lastButtonStateE != state)
     {
-        this->carNumber = this->carNumber + 1;
-        debugPrintln(this->carNumber);
+        this->pressureCount = this->pressureCount + 1;
+        debugPrintln(this->pressureCount);
         // Serial.println(this->carNumber);
         // Serial.println(lastButtonStateE);
     }
@@ -25,31 +25,31 @@ void CarCounting ::add(int state)
 }
 void CarCounting ::substract(int state)
 {
-    if (this->lastButtonStateS == HIGH && this->lastButtonStateS != state)
+    if (this->lastButtonStateS == HIGH && this->lastButtonStateS != state && this->pressureCount > 0)
     {
-        this->carNumber--;
+        this->pressureCount--;
         // Serial.println(this->carNumber);
-        debugPrintln(this->carNumber);
+        debugPrintln(this->pressureCount);
     }
     this->lastButtonStateS = state;
 }
 bool CarCounting ::isEmpty()
 {
-    return carNumber == 0;
+    return pressureCount == 0;
 }
 
-int CarCounting ::getPinE()
+uint8_t CarCounting ::getPinE()
 {
     return this->pinE;
 }
-int CarCounting ::getPinS()
+uint8_t CarCounting ::getPinS()
 {
     return this->pinS;
 }
 
-int CarCounting ::getCarNumber()
+uint8_t CarCounting ::getCarNumber()
 {
-    return this->carNumber;
+    return this->pressureCount / 2;
 }
 
 void CarCounting::change(int stateE, int stateS)

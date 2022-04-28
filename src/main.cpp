@@ -220,7 +220,7 @@ void setup()
 {
 	debugInit();
 
-	/*WiFi.begin(ssid, password);
+	WiFi.begin(ssid, password);
 
 	uint32_t notConnectedCounter = 0;
 	while (WiFi.status() != WL_CONNECTED)
@@ -234,7 +234,7 @@ void setup()
 			ESP.restart();
 		}
 	}
-	Serial.println("Connection au reseau reussie!");*/
+	Serial.println("Connection au reseau reussie!");
 
 	pinMode(stepPin, OUTPUT);
 	pinMode(dirPin, OUTPUT);
@@ -246,13 +246,13 @@ void setup()
 	pinMode(sensA.getPinE(), INPUT);
 	pinMode(sensA.getPinS(), INPUT);
 	// event handler
-	// webSocket.onEvent(webSocketEvent);
+	webSocket.onEvent(webSocketEvent);
 
 	// server address, port and URL
-	// webSocket.begin(host, port, path);
+	webSocket.begin(host, port, path);
 
 	// try every 7000 again if connection has failed
-	// webSocket.setReconnectInterval(7000);
+	webSocket.setReconnectInterval(7000);
 
 	// Objet pont levant
 	bridge.setOpenAngle(10 * 2 * PI);
@@ -266,7 +266,7 @@ void loop()
 	// --- Switch ---
 	// Add or substract a car to the bridge
 	sensA.change(digitalRead(sensA.getPinE()), digitalRead(sensA.getPinS()));
-	Serial.print("Cars nb: ");
+	// Serial.print("Cars nb: ");
 	Serial.println(sensA.getCarNumber());
 
 	newNbCarsOnTheBridge = sensA.getCarNumber();
@@ -275,14 +275,16 @@ void loop()
 		nbCarsOnTheBridge = newNbCarsOnTheBridge;
 
 		StaticJsonDocument<256> doc;
+		StaticJsonDocument<256> data;
 		StaticJsonDocument<256> fields;
 		fields["/document/pont/cars"] = nbCarsOnTheBridge;
-		doc.clear();
+		data["fields"] = fields;
 		doc["event"] = "update_doc";
-		doc["fields"] = fields;
+		doc["data"] = data;
 
 		String txt;
 		serializeJson(doc, txt);
+		serializeJson(doc, Serial);
 		webSocket.sendTXT(txt);
 	}
 	// Serial.println(digitalRead(15));
