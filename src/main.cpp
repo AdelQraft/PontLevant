@@ -14,8 +14,10 @@
 #include "../lib/arduinoWebSockets-master/src/WebSocketsClient.h"
 #include "../lib/ArduinoJson/src/ArduinoJson.h"
 
-const char *ssid = "robot03";
-const char *password = "alive160";
+//const char *ssid = "robot03";
+//const char *password = "alive160";
+const char *ssid = "LRIMA_2.4";
+const char *password = "LRIMA_SWAG_24";
 
 // const char *ssid = "LRIMA_2.4";
 // const char *password = "LRIMA_SWAG_24";
@@ -168,22 +170,19 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 		// TODO handle callbacks
 		if (event == EVT_ON_RECV)
 		{
-			byte actionId = doc["data"]["id"];
-			switch (actionId)
-			{
-			case 0:
+			char* actionId = doc["data"]["id"];
+
+			if(actionId == "close") {
 				bridge.close();
 				webSocket.sendTXT(
 						R"({"event": "update_doc","data": {"fields": {"/document/pont/ouvert": false}}})");
-				break;
-			case 1:
+			}
+			if (actionId == "open") {
 				webSocket.sendTXT(
 						R"({"event": "update_doc","data": {"fields": {"/document/pont/ouvert": true}}})");
 				bridge.open();
-				break;
-			default:
-				break;
 			}
+				
 			Serial.println("DONE");
 			StaticJsonDocument<256> responseData;
 			responseData["actionId"] = actionId;
