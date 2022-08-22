@@ -14,10 +14,10 @@
 #include "../lib/arduinoWebSockets-master/src/WebSocketsClient.h"
 #include "../lib/ArduinoJson/src/ArduinoJson.h"
 
-//const char *ssid = "robot03";
-//const char *password = "alive160";
-const char *ssid = "LRIMA_2.4";
-const char *password = "LRIMA_SWAG_24";
+const char *ssid = "robot03";
+const char *password = "alive160";
+// const char *ssid = "LRIMA_2.4";
+// const char *password = "LRIMA_SWAG_24";
 
 // const char *ssid = "LRIMA_2.4";
 // const char *password = "LRIMA_SWAG_24";
@@ -30,10 +30,10 @@ CarCounting sensA(PIN_ENTER_A, PIN_EXIT_A);
 // BoatDectection detectionA(TRIG_PIN_A, ECHO_PIN_A), detectionB(TRIG_PIN_B, ECHO_PIN_B);
 
 // constexpr uint8_t PIN_ENTER_A = 33, PIN_EXIT_A = 32;
-const int dirPin = 12;
-const int stepPin = 14;
-const int dirPin2 = 15;
-const int stepPin2 = 2;
+const int dirPin = 14;
+const int stepPin = 12;
+const int dirPin2 = 32;
+const int stepPin2 = 33;
 const int stepsPerRevolution = 3200;
 
 // constexpr uint8_t PIN_ENTER_A = 26, PIN_EXIT_A = 27;
@@ -41,9 +41,9 @@ const int stepsPerRevolution = 3200;
 
 // bridge.setOpenAngle sert à configurer l'angle d'ouverture. Augmenter si n'ouvre pas assez et diminuer si ouvre trop. Modifier le coefficient devant REVOLUTION_ANGLE dans la définition de REVOLUTION_ANGLE;
 MovableBridge<StepperDriver::A4988, StepperDriver::A4988> bridge(
-		StepperDriver::A4988::PinoutDescriptor(12, 14),
+		StepperDriver::A4988::PinoutDescriptor(stepPin, dirPin),
 		200,
-		StepperDriver::A4988::PinoutDescriptor(33, 32),
+		StepperDriver::A4988::PinoutDescriptor(stepPin2, dirPin2),
 		200);
 
 WebSocketsClient webSocket;
@@ -170,19 +170,23 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 		// TODO handle callbacks
 		if (event == EVT_ON_RECV)
 		{
-			char* actionId = doc["data"]["id"];
+			const char *actionId = doc["data"]["id"].as<const char *>();
 
-			if(actionId == "close") {
+			if (strcmp(actionId, "close") == 0)
+			{
+				Serial.println("CLOSE");
 				bridge.close();
 				webSocket.sendTXT(
 						R"({"event": "update_doc","data": {"fields": {"/document/pont/ouvert": false}}})");
 			}
-			if (actionId == "open") {
+			if (strcmp(actionId, "open") == 0)
+			{
+				Serial.println("OPEN");
 				webSocket.sendTXT(
 						R"({"event": "update_doc","data": {"fields": {"/document/pont/ouvert": true}}})");
 				bridge.open();
 			}
-				
+
 			Serial.println("DONE");
 			StaticJsonDocument<256> responseData;
 			responseData["actionId"] = actionId;
