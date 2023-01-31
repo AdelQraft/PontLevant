@@ -270,7 +270,6 @@ void loop()
 	// Add or substract a car to the bridge
 	sensA.change(digitalRead(sensA.getPinE()), digitalRead(sensA.getPinS()));
 	// Serial.print("Cars nb: ");
-	Serial.println(sensA.getCarNumber());
 
 	newNbCarsOnTheBridge = sensA.getCarNumber();
 	if (newNbCarsOnTheBridge != nbCarsOnTheBridge)
